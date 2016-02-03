@@ -133,20 +133,35 @@ public class TextTable {
   }
 
   public void addColumnConfiguration(String propertyName, String headline, int maxWidth) {
-    getTableColumns().add(new ColumnConfiguration(propertyName, headline, maxWidth));
+    getTableColumns().add(new ColumnConfiguration(propertyName, headline, maxWidth, false));
   }
 
   public void addColumnConfiguration(String propertyName, String headline, int maxWidth, int align) {
-    getTableColumns().add(new ColumnConfiguration(propertyName, headline, maxWidth, align));
+    getTableColumns().add(new ColumnConfiguration(propertyName, headline, maxWidth, align, false));
   }
 
   public void addColumnConfiguration(String propertyName, String headline, int maxWidth, int align, String dateFormat) {
-    getTableColumns().add(new ColumnConfiguration(propertyName, headline, maxWidth, align, dateFormat));
+    getTableColumns().add(new ColumnConfiguration(propertyName, headline, maxWidth, align, dateFormat, false));
+  }
+
+  public void addColumnConfigurationFixedWidth(String propertyName, String headline, int maxWidth) {
+    getTableColumns().add(new ColumnConfiguration(propertyName, headline, maxWidth, true));
+  }
+
+  public void addColumnConfigurationFixedWidth(String propertyName, String headline, int maxWidth, int align) {
+    getTableColumns().add(new ColumnConfiguration(propertyName, headline, maxWidth, align, true));
+  }
+
+  public void addColumnConfigurationFixedWidth(String propertyName, String headline, int maxWidth, int align, String dateFormat) {
+    getTableColumns().add(new ColumnConfiguration(propertyName, headline, maxWidth, align, dateFormat, true));
   }
 
   private void analyseData() {
     if (getTableData() != null) {
       for (ColumnConfiguration c : getTableColumns()) {
+        if(c.isFixWidth()){
+          continue;
+        }
         if (c.getProperty() != null && c.getProperty().trim().equals("")) {
           continue;
         }
@@ -228,8 +243,9 @@ public class TextTable {
     private int width;
     private String dateFormat = "yyyy.MM.dd HH:mm:ss.SSS";
     private int layout = ALIGN_LEFT;
+    private boolean fixWidth = false;
 
-    public ColumnConfiguration(String propertyName, String headline, int maxWidth) {
+    public ColumnConfiguration(String propertyName, String headline, int maxWidth, boolean fixWidth) {
       setProperty(propertyName);
       setHeadline(headline);
       if (headline.length() > maxWidth) {
@@ -238,9 +254,13 @@ public class TextTable {
         setMaxWidth(maxWidth);
       }
       setWidth(headline.length());
+      setFixWidth(fixWidth);
+      if(fixWidth){
+        setWidth(getMaxWidth());
+      }
     }
 
-    public ColumnConfiguration(String propertyName, String headline, int maxWidth, int layout) {
+    public ColumnConfiguration(String propertyName, String headline, int maxWidth, int layout, boolean fixWidth) {
       setProperty(propertyName);
       setHeadline(headline);
       if (headline.length() > maxWidth) {
@@ -250,9 +270,13 @@ public class TextTable {
       }
       setWidth(headline.length());
       setLayout(layout);
+      setFixWidth(fixWidth);
+      if(fixWidth){
+        setWidth(getMaxWidth());
+      }
     }
 
-    public ColumnConfiguration(String propertyName, String headline, int maxWidth, int layout, String dateFormat) {
+    public ColumnConfiguration(String propertyName, String headline, int maxWidth, int layout, String dateFormat, boolean fixWidth) {
       setProperty(propertyName);
       setHeadline(headline);
       if (headline.length() > maxWidth) {
@@ -263,6 +287,10 @@ public class TextTable {
       setWidth(headline.length());
       setDateFormat(dateFormat);
       setLayout(layout);
+      setFixWidth(fixWidth);
+      if(fixWidth){
+        setWidth(getMaxWidth());
+      }
     }
 
     public String getProperty() {
@@ -315,6 +343,14 @@ public class TextTable {
 
     public void setLayout(int layout) {
       this.layout = layout;
+    }
+
+    public boolean isFixWidth() {
+      return fixWidth;
+    }
+
+    public void setFixWidth(boolean fixWidth) {
+      this.fixWidth = fixWidth;
     }
   }
 }
